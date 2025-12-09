@@ -19,11 +19,12 @@ app.use("/api/messages",messageRoutes);
 
 //make ready for deployment
 if (process.env.NODE_ENV === "production") {
-  //app.use(express.static(Path.join(_dirname,"../frontend/dist")));
+  app.use(express.static(Path.join(_dirname,"../frontend/dist")));
 
-  //app.get("*", (req, res) => {
-    //res.sendFile(Path.join(_dirname, "../frontend", "dist", "index.html"));
-}
+  app.get("*", (req, res) => {
+    res.sendFile(Path.join(_dirname, "../frontend", "dist", "index.html"));
+  });
+};
 
 app.listen(PORT, () => {
   console.log("Server is running on port:" + PORT);
