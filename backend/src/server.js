@@ -16,9 +16,11 @@ const _dirname = Path.resolve();
 
 const PORT = ENV.PORT || 3000;
 
+console.log("CLIENT_URL:", ENV.CLIENT_URL);
+
 app.use(express.json());
 app.use(cors({
-  origin: ENV.CLIENT_URL, credentials: true
+  origin: "http://localhost:5173", credentials: true
 }));
 app.use(cookieParser());
 

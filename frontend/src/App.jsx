@@ -10,9 +10,10 @@ import { Toaster } from "react-hot-toast";
 function App() {
   const { checkAuth, isCheckingAuth, authUser } = useAuthStore();
 
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+ useEffect(() => {
+  checkAuth();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
   console.log({ authUser });
   if (isCheckingAuth) return <PageLoader />;
