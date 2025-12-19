@@ -4,7 +4,7 @@ import UsersLoadingSkeleton from "./UsersLoadingSkeleton";
 import NoChatsFound from "./NoChatsFound";
 
 function ChatsList() {
-  const { getMyChatContacts, chats, isUsersLoading, setSlectedUser } = useChatStore();
+  const { getMyChatContacts, chats, isUsersLoading, setSelectedUser } = useChatStore();
   useEffect(() => {
     getMyChatContacts()
   }, [getMyChatContacts])
@@ -19,7 +19,7 @@ function ChatsList() {
     {chats.map(chat => (
       <div key={chat._id}
       className="bg-cyan-500/10 p-4 rounded-lg cursor pointer hover:bg-cyan-500/20 transition-colors"
-      onClick={() => setSlectedUser(chat)}
+      onClick={() => setSelectedUser(chat)}
       >
         <div className="flex items-center gap-3">
           <div className={`avatar online`}>
