@@ -8,6 +8,8 @@ import NoConversationPlaceholder from "../components/NoConversationPlaceholder";
 
 function ChatPage() {
     const { activeTab, selectedUser} = useChatStore();
+    console.log("selectedUser:", selectedUser);
+
   return (
     <div className="min-h-screen w-full flex bg-gray-950">
         {/*LEFT SIDE*/}
