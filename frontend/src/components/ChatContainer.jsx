@@ -19,7 +19,7 @@ function ChatContainer() {
 
    useEffect(() => {
     if (messageEndRef.current) {
-      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+      messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
@@ -30,17 +30,32 @@ function ChatContainer() {
       {messages.length > 0 ? (
         <div className="max-w-3xl mx-auto space-y-6">
           {messages.map(msg => {
+            const isMyMessage = msg.senderId === authUser._id;
+
+  const avatarSrc = isMyMessage
+    ? authUser.profilePic
+    : selectedUser.profilePic;
+
             return(
             <div key={msg._id}
-            className= {`chat ${msg.senderId === authUser._id ? "chat-end" : "chat-start"}`}
+            className= {`chat ${isMyMessage ? "chat-end" : "chat-start"}`}
+            
             >
-              <div className={
-                `chat-bubble relative ${
-                  msg.senderId === authUser._id
-                  ? "bg-cyan-600 text-white"
-                  : "bg-slate-800 text-slate-200"
-                }`
-              } >
+
+              {/* AVATAR */}
+                  <div className="chat-image avatar">
+        <div className="w-10 rounded-full">
+          <img
+            src={avatarSrc || "/avatar.png"}
+            alt="profile"
+          />
+        </div>
+      </div>
+              <div className= {`chat-bubble relative ${
+                      isMyMessage
+                        ? "bg-cyan-600 text-white"
+                        : "bg-slate-800 text-slate-200"
+                    }`}>
                 {msg.image && (
                     <img src={msg.image} alt="Shared" className="rounded-lg h-48 object-cover" />
                   )}
