@@ -24,6 +24,9 @@ export const getMessagesByUserId = async (req, res) => {
                 { senderId: userToChatId, receiverId: myId }
             ]
         });
+        populate("senderId", "username profilePicture")
+populate("receiverId", "username profilePicture")
+sort({ createdAt: 1 });
         res.status(200).json(messages);
     } catch (error) {
         console.log("Error im getMessages controller:", error.message);
