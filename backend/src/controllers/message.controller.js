@@ -1,6 +1,7 @@
 import Message from "../models/message.js";
 import User from "../models/User.js";
 import cloudinary from "../lib/cloudinary.js";
+import { getRecieverSocketId, io } from "../lib/socket.js";
 
 export const getAllContacts = async (req, res) => {
     try {
@@ -23,10 +24,10 @@ export const getMessagesByUserId = async (req, res) => {
                 { senderId: myId, receiverId: userToChatId },
                 { senderId: userToChatId, receiverId: myId }
             ]
-        });
-        populate("senderId", "username profilePicture")
-populate("receiverId", "username profilePicture")
-sort({ createdAt: 1 });
+        })
+        .populate("senderId", "username profilePicture")
+        .populate("receiverId", "username profilePicture")
+         .sort({ createdAt: 1 });
         res.status(200).json(messages);
     } catch (error) {
         console.log("Error im getMessages controller:", error.message);
@@ -54,6 +55,11 @@ export const sendMessage = async (req, res) => {
         });
 
         await newMessage.save();
+
+        const receiverSocketId = getRecieverSocketId(receiverId)
+        if(receiverSocketId){
+            io.to(receiverSocketId).emit("newMessage", newMessage)
+        }
         res.status(201).json(newMessage);
     } catch (error) {
         console.log("Error in sendMessage controller:", error.message);
