@@ -1,90 +1,89 @@
 import { useEffect, useRef } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import { useChatStore } from "../store/useChatStore"
+import { useChatStore } from "../store/useChatStore";
 import ChatHeader from "./ChatHeader";
-import NoChatHistoryPlaceholder from "./NoChatHistoryPlaceholder"
+import NoChatHistoryPlaceholder from "./NoChatHistoryPlaceholder";
 import MessageInput from "./MessageInput";
 
-
 function ChatContainer() {
-  const{selectedUser, getMessagesByUserId, messages, subscribeToMessages, unsubscribeFromMessages} = useChatStore();
-  const {authUser} = useAuthStore();
-  const messageEndRef = useRef(null)
-
+  const {
+    selectedUser,
+    getMessagesByUserId,
+    messages,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  } = useChatStore();
+  const { authUser } = useAuthStore();
+  const messageEndRef = useRef(null);
 
   useEffect(() => {
-     if (!selectedUser?._id) return;
     getMessagesByUserId(selectedUser._id);
-    subscribeToMessages()
+    subscribeToMessages();
 
-    return () => unsubscribeFromMessages()
-  },[selectedUser, getMessagesByUserId, subscribeToMessages, unsubscribeFromMessages]);
+    return () => unsubscribeFromMessages();
+  }, [selectedUser._id, getMessagesByUserId, subscribeToMessages, unsubscribeFromMessages]);
 
-   useEffect(() => {
-    if (messageEndRef.current) {
-      messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  useEffect(() => {
+    if (messageEndRef.current && messages) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
+  if (!selectedUser) return <NoChatHistoryPlaceholder />;
+
   return (
-    <>
-    <ChatHeader />
-    <div className="flex-1 px-6 overflow-y-auto py-8">
-      {messages.length > 0 ? (
-        <div className="max-w-3xl mx-auto space-y-6">
-          {messages.map(msg => {
-            const isMyMessage = msg.senderId === authUser._id;
+    <div className="flex-1 flex flex-col overflow-auto">
+      <ChatHeader />
 
-  const avatarSrc = isMyMessage
-    ? authUser.profilePic
-    : selectedUser.profilePic;
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((message) => {
+          // SAFE CHECK: Handles both populated object (API) and string ID (Socket)
+          const isMyMessage = (message.senderId._id || message.senderId) === authUser._id;
 
-            return(
-            <div key={msg._id}
-            className= {`chat ${isMyMessage ? "chat-end" : "chat-start"}`}
-            
+          return (
+            <div
+              key={message._id}
+              className={`chat ${isMyMessage ? "chat-end" : "chat-start"}`}
+              ref={messageEndRef}
             >
-
-              {/* AVATAR */}
-                  <div className="chat-image avatar">
-        <div className="w-10 rounded-full">
-          <img
-            src={avatarSrc || "/avatar.png"}
-            alt="profile"
-          />
-        </div>
-      </div>
-              <div className= {`chat-bubble relative ${
+              <div className="chat-image avatar">
+                <div className="size-10 rounded-full border">
+                  <img
+                    src={
                       isMyMessage
-                        ? "bg-cyan-600 text-white"
-                        : "bg-slate-800 text-slate-200"
-                    }`}>
-                {msg.image && (
-                    <img src={msg.image} alt="Shared" className="rounded-lg h-48 object-cover" />
-                  )}
-                  {msg.text && <p className="mt-2">{msg.text}</p>}
-                  <p className="text-xs mt-1 opacity-75 flex items-center gap-1">
-                     {new Date(msg.createdAt).toLocaleTimeString(undefined, {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
+                        ? authUser.profilePicture || "/avatar.png"
+                        : selectedUser.profilePicture || "/avatar.png"
+                    }
+                    alt="profile pic"
+                  />
+                </div>
               </div>
-             </div>
-            )
-          })}
-          <div ref={messageEndRef}/>
-        </div>
-      ) : (
-        <NoChatHistoryPlaceholder name={selectedUser?.username} />
-      )}
-    </div>
-    <MessageInput/>
+              <div className="chat-header mb-1">
+                <time className="text-xs opacity-50 ml-1">
+                  {new Date(message.createdAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </time>
+              </div>
+              <div className="chat-bubble flex flex-col">
+                {message.image && (
+                  <img
+                    src={message.image}
+                    alt="Attachment"
+                    className="sm:max-w-[200px] rounded-md mb-2"
+                  />
+                )}
+                {message.text && <p>{message.text}</p>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
-    
-    </>
-    
-  )
+      <MessageInput />
+    </div>
+  );
 }
 
-export default ChatContainer
+export default ChatContainer;
