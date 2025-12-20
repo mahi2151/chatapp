@@ -20,7 +20,8 @@ console.log("CLIENT_URL:", ENV.CLIENT_URL);
 
 app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:5173", credentials: true
+  origin: ["http://localhost:5173", "https://chatapp-o5lz.onrender.com"],
+  credentials: true
 }));
 app.use(cookieParser());
 
